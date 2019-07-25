@@ -167,6 +167,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Constants\ImgBBConstants.cs" />
+    <Compile Include="Helpers\ImageHelper.cs" />
+    <Compile Include="Helpers\MimeTypeHelper.cs" />
+    <Compile Include="ImageProcessors\RESTAPIImageProcessor.cs" />
+    <Compile Include="Interfaces\IImageProcessor.cs" />
     <Compile Include="Models\StickerRequest.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
