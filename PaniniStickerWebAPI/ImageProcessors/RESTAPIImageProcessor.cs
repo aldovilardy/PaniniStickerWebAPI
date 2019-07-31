@@ -55,42 +55,43 @@ namespace PaniniStickerWebAPI.ImageProcessors
             return this;
         }
 
-        public IImageProcessor CreateOverlay(Image frontImage, Image backImage)
+        public IImageProcessor CreateOverlay(Image firstImage, Image secondImage)
         {
             try
             {
-                using (MemoryStream backImageStream = new MemoryStream())
-                using (MemoryStream frontImageStream = new MemoryStream())
-                {
-                    backImage.Save(backImageStream, backImage.RawFormat);
-                    frontImage.Save(frontImageStream, frontImage.RawFormat);
+                MemoryStream frontImageStream = new MemoryStream();
+                MemoryStream backImageStream = new MemoryStream();
 
-                    var client = new RestClient(OVERLAY_PROCESSOR_API);
-                    var request = new RestRequest(Method.POST);
-                    request.AddFile("uploadfile", backImageStream.ToArray(), MimeTypeHelper.GetMimeType(backImage.RawFormat))
-                           .AddFile("uploadfile2", frontImageStream.ToArray(), MimeTypeHelper.GetMimeType(frontImage.RawFormat))
-                           .AddParameter("efset", "2")
-                           .AddParameter("efset2", "50")
-                           .AddParameter("efset3", "4")
-                           .AddParameter("efset4", "1")
-                           .AddParameter("efset5", "100")
-                           .AddParameter("efset6", "5")
-                           .AddParameter("efset7", "0")
-                           .AddParameter("efset8", "0")
-                           .AddParameter("efset9", "2")
-                           .AddParameter("efset9", "2")
-                           .AddParameter("jpegtype", "1")
-                           .AddParameter("jpegqual", "92")
-                           .AddParameter("outformat", "3")
-                           .AddParameter("jpegmeta", "2");
-                    //call the api
-                    IRestResponse response = client.Execute(request);
+                firstImage.Save(frontImageStream, firstImage.RawFormat);
+                secondImage.Save(backImageStream, secondImage.RawFormat);
 
-                    string downloadImageUrl = ImageHelper.ScrapeImageFromHTML(response.Content, OVERLAY_HTML_RESULT);
+                var client = new RestClient(OVERLAY_PROCESSOR_API);
+                var request = new RestRequest(Method.POST);
+                request.AddFile("uploadfile", frontImageStream.ToArray(), MimeTypeHelper.GetMimeType(secondImage.RawFormat))
+                    .AddFile("uploadfile2", backImageStream.ToArray(), MimeTypeHelper.GetMimeType(firstImage.RawFormat))
+                    .AddParameter("efset", "2")
+                    .AddParameter("efset2", "50")
+                    .AddParameter("efset3", "4")
+                    .AddParameter("efset4", "1")
+                    .AddParameter("efset5", "100")
+                    .AddParameter("efset6", "5")
+                    .AddParameter("efset7", "0")
+                    .AddParameter("efset8", "0")
+                    .AddParameter("efset9", "2")
+                    .AddParameter("efset9", "2")
+                    .AddParameter("jpegtype", "1")
+                    .AddParameter("jpegqual", "92")
+                    .AddParameter("outformat", "3")
+                    .AddParameter("jpegmeta", "2");
+                //call the api
+                IRestResponse response = client.Execute(request);
 
-                    byte[] imgFileBytes = (new RestClient(downloadImageUrl)).DownloadData(new RestRequest(Method.GET));
-                    StickerImage = ImageHelper.GetImageFromArrayOfBytes(imgFileBytes);
-                }
+                string downloadImageUrl = ImageHelper.ScrapeImageFromHTML(response.Content, OVERLAY_HTML_RESULT);
+
+                byte[] imgFileBytes = ImageHelper.DownloadImageFromURLAndGetBytes(downloadImageUrl);
+                StickerImage = ImageHelper.GetImageFromArrayOfBytes(imgFileBytes);
+                backImageStream.Close();
+                frontImageStream.Close();
             }
             catch (Exception ex)
             {

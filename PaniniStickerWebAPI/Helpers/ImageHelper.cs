@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using RestSharp;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 namespace PaniniStickerWebAPI.Helpers
@@ -12,11 +14,19 @@ namespace PaniniStickerWebAPI.Helpers
         {
             Image result = null;
 
-            using (MemoryStream stream = new MemoryStream(byteImage))
-            {
-                result = Image.FromStream(stream, true, true);
-            }
+            MemoryStream stream = new MemoryStream(byteImage);
 
+            result = Image.FromStream(stream, true, true);
+
+
+            return result;
+        }
+
+        public static byte[] DownloadImageFromURLAndGetBytes(string url)
+        {
+            var client = new RestClient(url);
+            var httpReq = new RestRequest(Method.GET);
+            byte[] result = client.DownloadData(httpReq);
             return result;
         }
 
@@ -36,6 +46,12 @@ namespace PaniniStickerWebAPI.Helpers
 
             return finalImageUrl;
 
+        }
+
+        public static bool IsURL(string url)
+        {
+            Regex rx = new Regex(@"^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$");
+            return rx.IsMatch(url);
         }
 
         private static IEnumerable<string> GetSourceFromAnchorTag(string html)
