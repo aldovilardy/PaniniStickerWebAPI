@@ -144,5 +144,5 @@ Service to make your own Fifa Russia 2018 panini stickers.
 
 *After*
 
-![After](https://image.ibb.co/huRw7y/170620180133225695622_Sticker.png)
+![After](https://i.ibb.co/vPcHhnw/170620180133225695622-Sticker.png)
 
